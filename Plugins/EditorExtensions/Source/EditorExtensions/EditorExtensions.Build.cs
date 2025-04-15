@@ -10,14 +10,12 @@ public class EditorExtensions : ModuleRules
 		
 		PublicIncludePaths.AddRange(
 			new string[] {
-				// ... add public include paths required here ...
 			}
 			);
 				
 		
 		PrivateIncludePaths.AddRange(
 			new string[] {
-				// ... add other private include paths required here ...
 			}
 			);
 			
@@ -25,8 +23,7 @@ public class EditorExtensions : ModuleRules
 		PublicDependencyModuleNames.AddRange(
 			new string[]
 			{
-				"Core",
-				// ... add other public dependencies that you statically link with here ...
+				"Core", "Blutility", "Engine", "Engine"
 			}
 			);
 			
@@ -37,8 +34,8 @@ public class EditorExtensions : ModuleRules
 				"CoreUObject",
 				"Engine",
 				"Slate",
-				"SlateCore",
-				// ... add private dependencies that you statically link with here ...	
+				"SlateCore", 
+				"EditorScriptingUtilities",
 			}
 			);
 		
@@ -46,7 +43,6 @@ public class EditorExtensions : ModuleRules
 		DynamicallyLoadedModuleNames.AddRange(
 			new string[]
 			{
-				// ... add any modules that your module loads dynamically here ...
 			}
 			);
 	}

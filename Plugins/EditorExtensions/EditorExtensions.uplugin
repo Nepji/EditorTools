@@ -17,8 +17,8 @@
 	"Modules": [
 		{
 			"Name": "EditorExtensions",
-			"Type": "Runtime",
-			"LoadingPhase": "Default"
+			"Type": "Editor",
+			"LoadingPhase": "PreDefault"
 		}
 	]
 }
