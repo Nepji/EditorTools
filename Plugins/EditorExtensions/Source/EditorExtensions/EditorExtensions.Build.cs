@@ -23,7 +23,7 @@ public class EditorExtensions : ModuleRules
 		PublicDependencyModuleNames.AddRange(
 			new string[]
 			{
-				"Core", "Blutility", "Engine", "Engine"
+				"Core", "Blutility", "Engine", "UnrealEd"
 			}
 			);
 			
@@ -36,6 +36,7 @@ public class EditorExtensions : ModuleRules
 				"Slate",
 				"SlateCore", 
 				"EditorScriptingUtilities",
+				"UnrealEd"
 			}
 			);
 		

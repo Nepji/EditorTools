@@ -2,10 +2,12 @@
 
 #include "AssetActions/AssetActionExtender.h"
 
+#include "AssetToolsModule.h"
 #include "EditorUtilityLibrary.h"
 #include "EditorAssetLibrary.h"
+#include "ObjectTools.h"
+#include "AssetRegistry/AssetRegistryModule.h"
 #include "EditorExtensions/DebugUtils.h"
-
 
 void UAssetActionExtender::SmartDuplicate(int32 NumOfDuplicates)
 {
@@ -47,14 +49,14 @@ void UAssetActionExtender::SmartDuplicate(int32 NumOfDuplicates)
 void UAssetActionExtender::AddOrChangePrefix()
 {
 	TArray<UObject*> SelectedAssets = UEditorUtilityLibrary::GetSelectedAssets();
-	
-	for (UObject *Asset : SelectedAssets)
+
+	for (UObject* Asset : SelectedAssets)
 	{
 		const FString TargetPrefix = RequestPrefix(Asset);
 
 		FString UsedPrefix;
-		ExistedPrefix(Asset->GetName(),UsedPrefix);
-		ChangeAssetPrefix(Asset,TargetPrefix,UsedPrefix);
+		IsPrefixExist(Asset->GetName(), UsedPrefix);
+		ChangeAssetPrefix(Asset, TargetPrefix, UsedPrefix);
 	}
 	ShowNotifyInfo("Prefix Job status: Finished");
 }
@@ -62,7 +64,7 @@ void UAssetActionExtender::CleanupName()
 {
 	TArray<UObject*> SelectedAssets = UEditorUtilityLibrary::GetSelectedAssets();
 	const EAppReturnType::Type InputReturn = ShowMsgDialog(EAppMsgType::YesNo, "Find and Replace BAD used prefix?");
-	if(InputReturn == EAppReturnType::Yes)
+	if (InputReturn == EAppReturnType::Yes)
 	{
 		AddOrChangePrefix();
 	}
@@ -82,6 +84,33 @@ void UAssetActionExtender::CleanupName()
 	}
 	ShowNotifyInfo("Cleaning status: Finished");
 }
+void UAssetActionExtender::RemoveUnusedAssets()
+{
+	TArray<FAssetData> SelectedAssetsData = UEditorUtilityLibrary::GetSelectedAssetData();
+	TArray<FAssetData> UnusedAssetsData;
+	for (FAssetData& SelectedAssetData : SelectedAssetsData)
+	{
+
+		TArray<FString> AssetReferences = UEditorAssetLibrary::FindPackageReferencersForAsset(SelectedAssetData.ObjectPath.ToString());
+		if (AssetReferences.IsEmpty())
+		{
+			UnusedAssetsData.Add(SelectedAssetData);
+		}
+	}
+	FixUpRedirectors();
+	if (UnusedAssetsData.IsEmpty())
+	{
+		ShowNotifyInfo("Unused assets not found");
+		return;
+	}
+
+	const int32 NumOfDeletedAssets = ObjectTools::DeleteAssets(UnusedAssetsData);
+
+	if (NumOfDeletedAssets != 0)
+	{
+		ShowNotifyInfo("Successfully deleted " + FString::FromInt(NumOfDeletedAssets) + " assets.");
+	}
+}
 FString UAssetActionExtender::RequestPrefix(UObject* Obj) const
 {
 	FString BadResult = "Unknown_";
@@ -93,21 +122,22 @@ FString UAssetActionExtender::RequestPrefix(UObject* Obj) const
 	const FString* Prefix = AssetPrefixMap.Find(Obj->GetClass()->GetName());
 	return Prefix ? *Prefix : *BadResult;
 }
-void UAssetActionExtender::ChangeAssetPrefix(UObject* Obj, const FString& TargetPrefix,const FString& UsedPrefix) const
+void UAssetActionExtender::ChangeAssetPrefix(UObject* Obj, const FString& TargetPrefix, const FString& UsedPrefix) const
 {
 	FString NewObjName = Obj->GetName();
-	if(UsedPrefix.IsEmpty())
+	if (UsedPrefix.IsEmpty())
 	{
-		NewObjName.ReplaceInline(*UsedPrefix,*TargetPrefix);
+		NewObjName.ReplaceInline(*UsedPrefix, *TargetPrefix);
 	}
-	if(*UsedPrefix != TargetPrefix)
+	if (*UsedPrefix != TargetPrefix)
 	{
-		UEditorUtilityLibrary::RenameAsset(Obj,NewObjName);
+		UEditorUtilityLibrary::RenameAsset(Obj, NewObjName);
 	}
 }
-bool UAssetActionExtender::ExistedPrefix(const FString& ObjName, FString& Prefix)
+bool UAssetActionExtender::IsPrefixExist(const FString& ObjName, FString& Prefix)
 {
-	for (auto AssetPrefix : AssetPrefixMap) {
+	for (auto AssetPrefix : AssetPrefixMap)
+	{
 		if (ObjName.StartsWith(AssetPrefix.Value))
 		{
 			Prefix = AssetPrefix.Value;
@@ -116,4 +146,31 @@ bool UAssetActionExtender::ExistedPrefix(const FString& ObjName, FString& Prefix
 	}
 	return false;
 }
+void UAssetActionExtender::FixUpRedirectors()
+{
+	TArray<UObjectRedirector*> RedirectorsFixArray;
 
+	const FAssetRegistryModule& AssetRegistryModule = FModuleManager::Get().LoadModuleChecked<FAssetRegistryModule>(TEXT("AssetRegistry"));
+
+	FARFilter Filter;
+	Filter.bRecursivePaths = true;
+	Filter.PackagePaths.Emplace("/Game");
+	Filter.ClassNames.Emplace("ObjectRedirector");
+
+	TArray<FAssetData> OutRedirectors;
+	
+	AssetRegistryModule.Get().GetAssets(Filter, OutRedirectors);
+
+	for(const FAssetData& RedirectorData : OutRedirectors)
+	{
+		if(UObjectRedirector* RedirectorToFix = Cast<UObjectRedirector>(RedirectorData.GetAsset()))
+		{
+			RedirectorsFixArray.Add(RedirectorToFix);
+		}
+		
+	}
+
+	const FAssetToolsModule& AssetToolsModule = FModuleManager::LoadModuleChecked<FAssetToolsModule>(TEXT("AssetTools"));
+
+	AssetToolsModule.Get().FixupReferencers(RedirectorsFixArray);
+}

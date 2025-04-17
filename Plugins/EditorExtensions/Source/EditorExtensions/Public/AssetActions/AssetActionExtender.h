@@ -23,11 +23,15 @@ class EDITOREXTENSIONS_API UAssetActionExtender : public UAssetActionUtility
 	UFUNCTION(CallInEditor)
 	void CleanupName();
 
+	UFUNCTION(CallInEditor)
+	void RemoveUnusedAssets();
+
 private:
 	FString RequestPrefix(UObject* Obj) const;
 	void ChangeAssetPrefix(UObject* Obj, const FString& TargetPrefix, const FString& UsedPrefix) const;
+	bool IsPrefixExist(const FString& ObjName, FString& Prefix);
 
-	bool ExistedPrefix(const FString& ObjName, FString& Prefix);
+	void FixUpRedirectors();
 
 private:
 	TMap<FString, FString> AssetPrefixMap = {

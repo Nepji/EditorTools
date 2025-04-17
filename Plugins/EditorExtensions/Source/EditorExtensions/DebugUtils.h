@@ -3,7 +3,8 @@
 #include "Widgets/Notifications/SNotificationList.h"
 #include "Framework/Notifications/NotificationManager.h"
 
-DECLARE_LOG_CATEGORY_EXTERN(Log_EditorExtensions, Log, All);
+//DECLARE_LOG_CATEGORY_EXTERN(Log_EditorExtensions, Log, All);
+
 
 inline void Print(const FString& Message, const FColor& Color = FColor::Red)
 {
@@ -15,7 +16,7 @@ inline void Print(const FString& Message, const FColor& Color = FColor::Red)
 
 inline void PrintLog(const FString& Message)
 {
-	UE_LOG(Log_EditorExtensions,Warning,TEXT("%s"), *Message);
+	UE_LOG(LogTemp,Warning,TEXT("%s"), *Message);
 }
 
 
@@ -31,7 +32,7 @@ inline EAppReturnType::Type ShowMsgDialog(EAppMsgType::Type MsgType, const FStri
 inline void ShowNotifyInfo(const FString& Message)
 {
 	FNotificationInfo NotifyInfo(FText::FromString(Message));
-	NotifyInfo.bUseLargeFont(true);
+	NotifyInfo.bUseLargeFont = true;
 	NotifyInfo.FadeOutDuration = 7.f;
 
 	FSlateNotificationManager::Get().AddNotification(NotifyInfo);
