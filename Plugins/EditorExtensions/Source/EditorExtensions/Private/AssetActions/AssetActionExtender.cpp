@@ -13,7 +13,7 @@ void UAssetActionExtender::SmartDuplicate(int32 NumOfDuplicates)
 {
 	if (NumOfDuplicates <= 0)
 	{
-		ShowMsgDialog(EAppMsgType::Ok, "Number of wishing duplicates must be greater then 0.");
+		DebugHepler::ShowMsgDialog(EAppMsgType::Ok, "Number of wishing duplicates must be greater then 0.");
 		return;
 	}
 
@@ -36,15 +36,15 @@ void UAssetActionExtender::SmartDuplicate(int32 NumOfDuplicates)
 			}
 			else
 			{
-				PrintLog("Error while duplicating Asset: " + CurrentAssetName);
+				DebugHepler::PrintLog("Error while duplicating Asset: " + CurrentAssetName);
 			}
 		}
 		if (ToDoCounter != NumOfDuplicates)
 		{
-			ShowNotifyInfo("Duplication status: Error (Check Log for details)");
+			DebugHepler::ShowNotifyInfo("Duplication status: Error (Check Log for details)");
 		}
 	}
-	ShowNotifyInfo("Duplication status: Finished");
+	DebugHepler::ShowNotifyInfo("Duplication status: Finished");
 }
 void UAssetActionExtender::AddOrChangePrefix()
 {
@@ -58,13 +58,12 @@ void UAssetActionExtender::AddOrChangePrefix()
 		IsPrefixExist(Asset->GetName(), UsedPrefix);
 		ChangeAssetPrefix(Asset, TargetPrefix, UsedPrefix);
 	}
-	ShowNotifyInfo("Prefix Job status: Finished");
+	DebugHepler::ShowNotifyInfo("Prefix Job status: Finished");
 }
-void UAssetActionExtender::CleanupName()
+void UAssetActionExtender::CleanupName(bool bReplaceBADPrefixes)
 {
 	TArray<UObject*> SelectedAssets = UEditorUtilityLibrary::GetSelectedAssets();
-	const EAppReturnType::Type InputReturn = ShowMsgDialog(EAppMsgType::YesNo, "Find and Replace BAD used prefix?");
-	if (InputReturn == EAppReturnType::Yes)
+	if (bReplaceBADPrefixes)
 	{
 		AddOrChangePrefix();
 	}
@@ -82,7 +81,7 @@ void UAssetActionExtender::CleanupName()
 			UEditorUtilityLibrary::RenameAsset(Asset, NewName);
 		}
 	}
-	ShowNotifyInfo("Cleaning status: Finished");
+	DebugHepler::ShowNotifyInfo("Cleaning status: Finished");
 }
 void UAssetActionExtender::RemoveUnusedAssets()
 {
@@ -100,7 +99,7 @@ void UAssetActionExtender::RemoveUnusedAssets()
 	FixUpRedirectors();
 	if (UnusedAssetsData.IsEmpty())
 	{
-		ShowNotifyInfo("Unused assets not found");
+		DebugHepler::ShowNotifyInfo("Unused assets not found");
 		return;
 	}
 
@@ -108,7 +107,7 @@ void UAssetActionExtender::RemoveUnusedAssets()
 
 	if (NumOfDeletedAssets != 0)
 	{
-		ShowNotifyInfo("Successfully deleted " + FString::FromInt(NumOfDeletedAssets) + " assets.");
+	  DebugHepler::ShowNotifyInfo("Successfully deleted " + FString::FromInt(NumOfDeletedAssets) + " assets.");
 	}
 }
 FString UAssetActionExtender::RequestPrefix(UObject* Obj) const
@@ -125,9 +124,13 @@ FString UAssetActionExtender::RequestPrefix(UObject* Obj) const
 void UAssetActionExtender::ChangeAssetPrefix(UObject* Obj, const FString& TargetPrefix, const FString& UsedPrefix) const
 {
 	FString NewObjName = Obj->GetName();
-	if (UsedPrefix.IsEmpty())
+	if (!UsedPrefix.IsEmpty())
 	{
 		NewObjName.ReplaceInline(*UsedPrefix, *TargetPrefix);
+	}
+	else
+	{
+		NewObjName = TargetPrefix+NewObjName;
 	}
 	if (*UsedPrefix != TargetPrefix)
 	{

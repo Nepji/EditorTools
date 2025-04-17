@@ -14,6 +14,9 @@ class EDITOREXTENSIONS_API UAssetActionExtender : public UAssetActionUtility
 {
 	GENERATED_BODY()
 
+public:
+	static void FixUpRedirectors();
+
 	UFUNCTION(CallInEditor)
 	void SmartDuplicate(int32 NumOfDuplicates);
 
@@ -21,7 +24,7 @@ class EDITOREXTENSIONS_API UAssetActionExtender : public UAssetActionUtility
 	void AddOrChangePrefix();
 
 	UFUNCTION(CallInEditor)
-	void CleanupName();
+	void CleanupName(bool bReplaceBADPrefixes);
 
 	UFUNCTION(CallInEditor)
 	void RemoveUnusedAssets();
@@ -31,7 +34,7 @@ private:
 	void ChangeAssetPrefix(UObject* Obj, const FString& TargetPrefix, const FString& UsedPrefix) const;
 	bool IsPrefixExist(const FString& ObjName, FString& Prefix);
 
-	void FixUpRedirectors();
+
 
 private:
 	TMap<FString, FString> AssetPrefixMap = {
