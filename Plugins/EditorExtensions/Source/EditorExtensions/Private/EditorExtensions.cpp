@@ -7,16 +7,27 @@
 #include "ObjectTools.h"
 #include "AssetActions/AssetActionExtender.h"
 #include "EditorExtensions/DebugUtils.h"
+#include "SlateWidgets/AdvancedDeletionWidget.h"
 
 #define LOCTEXT_NAMESPACE "FEditorExtensionsModule"
 
 void FEditorExtensionsModule::StartupModule()
 {
 	InitCBMenuExtension();
+	RegisterAdvancedDeletionTab();
 }
 
 void FEditorExtensionsModule::ShutdownModule()
 {
+}
+bool FEditorExtensionsModule::DeleteAsset(const FAssetData& AssetData)
+{
+	TArray<FAssetData> AssetArray = { AssetData };
+	return ObjectTools::DeleteAssets(AssetArray) != 0;
+}
+bool FEditorExtensionsModule::DeleteAssets(TArray<FAssetData> SelectedAssetData)
+{
+	return ObjectTools::DeleteAssets(SelectedAssetData) != 0;
 }
 TSharedRef<FExtender> FEditorExtensionsModule::CustomCBMenuExtender(const TArray<FString>& SelectedPaths)
 {
@@ -42,23 +53,32 @@ void FEditorExtensionsModule::InitCBMenuExtension()
 	TArray<FContentBrowserMenuExtender_SelectedPaths>& BrowserContentExtenders = ContentBrowserModule.GetAllPathViewContextMenuExtenders();
 
 	BrowserContentExtenders.Add(FContentBrowserMenuExtender_SelectedPaths::CreateRaw(this,
-		&FEditorExtensionsModule::CustomCBMenuExtender));
+																					 &FEditorExtensionsModule::CustomCBMenuExtender));
 }
 void FEditorExtensionsModule::AddCBMenuEntry(FMenuBuilder& MenuBuilder)
 {
+	// Delete Unused Assets
 	MenuBuilder.AddMenuEntry(
 		FText::FromString(TEXT("Delete Unused Assets")),
 		FText::FromString(TEXT("Safety delete all unused assets under folder")),
 		FSlateIcon(),
-		FExecuteAction::CreateRaw(this, &FEditorExtensionsModule::OnDeleteUnusedAssetsDelete));
+		FExecuteAction::CreateRaw(this, &FEditorExtensionsModule::OnDeleteUnusedAssets));
 
+	// Delete Unused Folders and Assets
 	MenuBuilder.AddMenuEntry(
 		FText::FromString(TEXT("Delete Unused Folders and Assets")),
 		FText::FromString(TEXT("Safety delete all unused folders and assets under selected folder")),
 		FSlateIcon(),
 		FExecuteAction::CreateRaw(this, &FEditorExtensionsModule::OnEmptyFoldersAndAssetsDelete));
+
+	// Advance Deletion
+	MenuBuilder.AddMenuEntry(
+		FText::FromString(TEXT("Advance Deletion")),
+		FText::FromString(TEXT("Not implemented yet.")),
+		FSlateIcon(),
+		FExecuteAction::CreateRaw(this, &FEditorExtensionsModule::OnAdvancedDeletion));
 }
-void FEditorExtensionsModule::OnDeleteUnusedAssetsDelete()
+void FEditorExtensionsModule::OnDeleteUnusedAssets()
 {
 	if (FoldersPaths.Num() <= 0)
 	{
@@ -72,8 +92,8 @@ void FEditorExtensionsModule::OnDeleteUnusedAssetsDelete()
 
 	UAssetActionExtender::FixUpRedirectors();
 
-	DebugHepler::Print(TEXT("Currently running through folder: ") + FoldersPaths[0], FColor::Blue);
-	TArray<FString> AssetList = UEditorAssetLibrary::ListAssets(FoldersPaths[0]);
+	DebugHepler::Print(TEXT("Currently running through folder: ") + FoldersPaths[ 0 ], FColor::Blue);
+	TArray<FString> AssetList = UEditorAssetLibrary::ListAssets(FoldersPaths[ 0 ]);
 
 	if (AssetList.IsEmpty())
 	{
@@ -121,11 +141,11 @@ void FEditorExtensionsModule::OnDeleteUnusedAssetsDelete()
 }
 void FEditorExtensionsModule::OnEmptyFoldersAndAssetsDelete()
 {
-	OnDeleteUnusedAssetsDelete();
-	
+	OnDeleteUnusedAssets();
+
 	UAssetActionExtender::FixUpRedirectors();
 
-	TArray<FString> FolderPathSelected = UEditorAssetLibrary::ListAssets(FoldersPaths[0], true, true);
+	TArray<FString> FolderPathSelected = UEditorAssetLibrary::ListAssets(FoldersPaths[ 0 ], true, true);
 	uint32 FolderCounter = 0;
 
 	FString EmptyFolderPathsName;
@@ -174,6 +194,73 @@ void FEditorExtensionsModule::OnEmptyFoldersAndAssetsDelete()
 		}
 	}
 	DebugHepler::ShowNotifyInfo("Successfully deleted " + FString::FromInt(FolderCounter) + " folders.");
+}
+void FEditorExtensionsModule::OnAdvancedDeletion()
+{
+	UAssetActionExtender::FixUpRedirectors();
+
+	FGlobalTabmanager::Get()->TryInvokeTab(FName("AdvancedDeletion"));
+}
+void FEditorExtensionsModule::RegisterAdvancedDeletionTab()
+{
+	FGlobalTabmanager::Get()->RegisterNomadTabSpawner(
+								FName("AdvancedDeletion"),
+								FOnSpawnTab::CreateRaw(this, &FEditorExtensionsModule::OnSpawnAdvanceDeletion))
+		.SetDisplayName(FText::FromString(TEXT("Advanced Deletion")));
+}
+TSharedRef<SDockTab> FEditorExtensionsModule::OnSpawnAdvanceDeletion(const FSpawnTabArgs& SpawnTabArgs)
+{
+	return SNew(SDockTab).TabRole(ETabRole::NomadTab)
+		[ SNew(SAdvanceDeletionsTab)
+			  .AssetsDataToStore(GetAllAssetDataUnderSelectedFolder()) ];
+}
+TArray<TSharedPtr<FAssetData>> FEditorExtensionsModule::GetAllAssetDataUnderSelectedFolder()
+{
+	TArray<TSharedPtr<FAssetData>> AvailableAssetData;
+
+	if (FoldersPaths.IsEmpty())
+	{
+		return AvailableAssetData;
+	}
+
+	TArray<FString> AssetPathNames = UEditorAssetLibrary::ListAssets(FoldersPaths[ 0 ]);
+
+	for (const FString& AssetPath : AssetPathNames)
+	{
+		if (AssetPath.Contains(TEXT("Developers"))
+			|| AssetPath.Contains(TEXT("Colletions"))
+			|| AssetPath.Contains(TEXT("__ExternalActors__"))
+			|| AssetPath.Contains(TEXT("__ExternalObjects__")))
+		{
+			DebugHepler::ShowNotifyInfo(TEXT("Don`t touch root folders"));
+			continue;
+		}
+
+		if (!UEditorAssetLibrary::DoesAssetExist(AssetPath))
+		{
+			continue;
+		}
+
+		const FAssetData Data = UEditorAssetLibrary::FindAssetData(AssetPath);
+		AvailableAssetData.Add(MakeShared<FAssetData>(Data));
+	}
+	return AvailableAssetData;
+}
+void FEditorExtensionsModule::GetFilteredAssetData(const TArray<TSharedPtr<FAssetData>>& AssetDataToFilter, TArray<TSharedPtr<FAssetData>>& FilteredAssetData)
+{
+	FilteredAssetData.Empty();
+	for (const TSharedPtr<FAssetData>& Data : AssetDataToFilter)
+	{
+		TArray<FString> AssetRef =
+			UEditorAssetLibrary::FindPackageReferencersForAsset(Data->GetObjectPathString());
+
+		if(!AssetRef.IsEmpty())
+		{
+			continue;
+		}
+
+		FilteredAssetData.Add(Data);
+	}
 }
 #undef LOCTEXT_NAMESPACE
 

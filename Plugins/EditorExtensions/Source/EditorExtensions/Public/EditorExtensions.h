@@ -8,11 +8,14 @@
 class FEditorExtensionsModule : public IModuleInterface
 {
 public:
-
-	/** IModuleInterface implementation */
 	virtual void StartupModule() override;
 	virtual void ShutdownModule() override;
 
+public:
+	bool DeleteAsset(const FAssetData& AssetData);
+	bool DeleteAssets(TArray<FAssetData> SelectedAssetData);
+
+	void GetFilteredAssetData(const TArray<TSharedPtr<FAssetData>>& AssetDataToFilter, TArray<TSharedPtr<FAssetData>>& FilteredAssetData);
 private:
 	TSharedRef<FExtender> CustomCBMenuExtender(const TArray<FString>& SelectedPaths);
 
@@ -21,7 +24,13 @@ private:
 	void InitCBMenuExtension();
 	void AddCBMenuEntry(class FMenuBuilder& MenuBuilder);
 
-	void OnDeleteUnusedAssetsDelete();
+	void OnDeleteUnusedAssets();
 	void OnEmptyFoldersAndAssetsDelete();
+	void OnAdvancedDeletion();
+	
+	void RegisterAdvancedDeletionTab();
+	TSharedRef<SDockTab> OnSpawnAdvanceDeletion(const FSpawnTabArgs& SpawnTabArgs);
+
+	TArray<TSharedPtr<FAssetData>> GetAllAssetDataUnderSelectedFolder();
 	
 };

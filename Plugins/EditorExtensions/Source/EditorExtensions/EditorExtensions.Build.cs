@@ -29,7 +29,8 @@ public class EditorExtensions : ModuleRules
 				"Blutility",
 				"Engine",
 				"UnrealEd",
-				"ContentBrowser"
+				"ContentBrowser",
+				"InputCore"
 			}
 		);
 
