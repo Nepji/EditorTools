@@ -22,7 +22,7 @@ void FEditorExtensionsModule::ShutdownModule()
 }
 bool FEditorExtensionsModule::DeleteAsset(const FAssetData& AssetData)
 {
-	TArray<FAssetData> AssetArray = { AssetData };
+	const TArray<FAssetData> AssetArray = { AssetData };
 	return ObjectTools::DeleteAssets(AssetArray) != 0;
 }
 bool FEditorExtensionsModule::DeleteAssets(TArray<FAssetData> SelectedAssetData)
@@ -180,7 +180,7 @@ void FEditorExtensionsModule::OnEmptyFoldersAndAssetsDelete()
 		return;
 	}
 
-	EAppReturnType::Type ConfirmReturn = DebugHepler::ShowMsgDialog(EAppMsgType::OkCancel, TEXT("Found ") + FString::FromInt(EmptyFolderPathsArray.Num()) + "\nList: " + EmptyFolderPathsName + "\n\nConfirm to delete?");
+	const EAppReturnType::Type ConfirmReturn = DebugHepler::ShowMsgDialog(EAppMsgType::OkCancel, TEXT("Found ") + FString::FromInt(EmptyFolderPathsArray.Num()) + "\nList: " + EmptyFolderPathsName + "\n\nConfirm to delete?");
 
 	if (ConfirmReturn == EAppReturnType::Cancel)
 	{
@@ -246,7 +246,7 @@ TArray<TSharedPtr<FAssetData>> FEditorExtensionsModule::GetAllAssetDataUnderSele
 	}
 	return AvailableAssetData;
 }
-void FEditorExtensionsModule::GetFilteredAssetData(const TArray<TSharedPtr<FAssetData>>& AssetDataToFilter, TArray<TSharedPtr<FAssetData>>& FilteredAssetData)
+void FEditorExtensionsModule::GetUnusedAssetData(const TArray<TSharedPtr<FAssetData>>& AssetDataToFilter, TArray<TSharedPtr<FAssetData>>& FilteredAssetData)
 {
 	FilteredAssetData.Empty();
 	for (const TSharedPtr<FAssetData>& Data : AssetDataToFilter)
@@ -254,13 +254,48 @@ void FEditorExtensionsModule::GetFilteredAssetData(const TArray<TSharedPtr<FAsse
 		TArray<FString> AssetRef =
 			UEditorAssetLibrary::FindPackageReferencersForAsset(Data->GetObjectPathString());
 
-		if(!AssetRef.IsEmpty())
+		if (!AssetRef.IsEmpty())
 		{
 			continue;
 		}
 
 		FilteredAssetData.Add(Data);
 	}
+}
+void FEditorExtensionsModule::GetDuplicatedAssetData(const TArray<TSharedPtr<FAssetData>>& AssetDataToFilter, TArray<TSharedPtr<FAssetData>>& FilteredAssetData)
+{
+	FilteredAssetData.Empty();
+
+	TMultiMap<FString, TSharedPtr<FAssetData>> AssetsInfoMultiMap;
+
+	for (const TSharedPtr<FAssetData>& Data : AssetDataToFilter)
+	{
+		AssetsInfoMultiMap.Emplace(Data->AssetName.ToString(), Data);
+	}
+
+	for (const TSharedPtr<FAssetData>& Data : AssetDataToFilter)
+	{
+		TArray<TSharedPtr<FAssetData>> OutAssetData;
+		AssetsInfoMultiMap.MultiFind(Data->AssetName.ToString(), OutAssetData);
+
+		if (OutAssetData.Num() <= 1)
+		{
+			continue;
+		}
+
+		for (const TSharedPtr<FAssetData>& SameData : OutAssetData)
+		{
+			if (SameData.IsValid())
+			{
+				FilteredAssetData.AddUnique(SameData);
+			}
+		}
+	}
+}
+void FEditorExtensionsModule::SyncCBToClickedAsset(const FString& AssetPath)
+{
+	const TArray<FString> AssetPaths = {AssetPath};
+	UEditorAssetLibrary::SyncBrowserToObjects(AssetPaths);
 }
 #undef LOCTEXT_NAMESPACE
 

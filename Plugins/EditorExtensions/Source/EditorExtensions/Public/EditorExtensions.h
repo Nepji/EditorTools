@@ -15,7 +15,10 @@ public:
 	bool DeleteAsset(const FAssetData& AssetData);
 	bool DeleteAssets(TArray<FAssetData> SelectedAssetData);
 
-	void GetFilteredAssetData(const TArray<TSharedPtr<FAssetData>>& AssetDataToFilter, TArray<TSharedPtr<FAssetData>>& FilteredAssetData);
+	void GetUnusedAssetData(const TArray<TSharedPtr<FAssetData>>& AssetDataToFilter, TArray<TSharedPtr<FAssetData>>& FilteredAssetData);
+	void GetDuplicatedAssetData(const TArray<TSharedPtr<FAssetData>>& AssetDataToFilter, TArray<TSharedPtr<FAssetData>>& FilteredAssetData);
+
+	void SyncCBToClickedAsset(const FString& AssetPath);
 private:
 	TSharedRef<FExtender> CustomCBMenuExtender(const TArray<FString>& SelectedPaths);
 
@@ -32,5 +35,6 @@ private:
 	TSharedRef<SDockTab> OnSpawnAdvanceDeletion(const FSpawnTabArgs& SpawnTabArgs);
 
 	TArray<TSharedPtr<FAssetData>> GetAllAssetDataUnderSelectedFolder();
+	
 	
 };

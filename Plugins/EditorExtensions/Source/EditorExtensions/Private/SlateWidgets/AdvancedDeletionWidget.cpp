@@ -19,8 +19,10 @@ void SAdvanceDeletionsTab::Construct(const FArguments& InArgs)
 	FSlateFontInfo TitleTextFont = GetEmbossedTextFont();
 	TitleTextFont.Size = 30;
 
+	ComboSourceItems.Empty();
 	ComboSourceItems.Add(MakeShared<FString>(ListALL));
 	ComboSourceItems.Add(MakeShared<FString>(ListUnused));
+	ComboSourceItems.Add(MakeShared<FString>(ListDuplicated));
 
 	ChildSlot
 		[
@@ -87,7 +89,8 @@ TSharedRef<SListView<TSharedPtr<FAssetData>>> SAdvanceDeletionsTab::ConstructAss
 	ConstructedAssetListView = SNew(SListView<TSharedPtr<FAssetData>>)
 								   .ItemHeight(24.f)
 								   .ListItemsSource(&DisplayedAssetsData)
-								   .OnGenerateRow(this, &SAdvanceDeletionsTab::OnGenerateRowForList);
+								   .OnGenerateRow(this, &SAdvanceDeletionsTab::OnGenerateRowForList)
+								   .OnMouseButtonClick(this, &SAdvanceDeletionsTab::OnRowWidgetMouseButtonClicked);
 
 	return ConstructedAssetListView.ToSharedRef();
 }
@@ -140,7 +143,7 @@ TSharedRef<ITableRow> SAdvanceDeletionsTab::OnGenerateRowForList(TSharedPtr<FAss
 							[ ConstructTextBLock(DisplayAssetPath, AssetClassNameFort) ]
 				  // ButtonToDeleteDirectly
 				  + SHorizontalBox::Slot()
-						.HAlign(HAlign_Center)
+						.HAlign(HAlign_Right)
 						.VAlign(VAlign_Fill)
 							[ ConstructDeleteButton(AssetDataToDisplay) ] ];
 
@@ -196,13 +199,22 @@ void SAdvanceDeletionsTab::OnComboSelectionChanged(TSharedPtr<FString> SelectedO
 	if (*SelectedOption.Get() == ListALL)
 	{
 		DisplayedAssetsData = StoredAssetsData;
-		RefreshAssetListView();
 	}
 	else if (*SelectedOption.Get() == ListUnused)
 	{
-		EditorExtensionsModule.GetFilteredAssetData(StoredAssetsData, DisplayedAssetsData);
-		RefreshAssetListView();
+		EditorExtensionsModule.GetUnusedAssetData(StoredAssetsData, DisplayedAssetsData);
 	}
+	else if (*SelectedOption.Get() == ListDuplicated)
+	{
+		EditorExtensionsModule.GetDuplicatedAssetData(StoredAssetsData, DisplayedAssetsData);
+	}
+
+	RefreshAssetListView();
+}
+void SAdvanceDeletionsTab::OnRowWidgetMouseButtonClicked(TSharedPtr<FAssetData> ClickedData)
+{
+	FEditorExtensionsModule& EditorExtensionsModule = FModuleManager::LoadModuleChecked<FEditorExtensionsModule>(TEXT("EditorExtensions"));
+	EditorExtensionsModule.SyncCBToClickedAsset(ClickedData->GetObjectPathString());
 }
 void SAdvanceDeletionsTab::OnCheckBoxStateChange(ECheckBoxState NewState, TSharedPtr<FAssetData> AssetData)
 {

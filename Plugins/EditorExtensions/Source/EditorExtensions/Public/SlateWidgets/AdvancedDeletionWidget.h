@@ -30,6 +30,7 @@ private:
 
 	TSharedRef<SWidget> OnGenerateComboContent(TSharedPtr<FString> SourceItem);
 	void OnComboSelectionChanged(TSharedPtr<FString> SelectedOption, ESelectInfo::Type InSelectInfo);
+	void OnRowWidgetMouseButtonClicked(TSharedPtr<FAssetData> ClickedData);
 
 	void OnCheckBoxStateChange(ECheckBoxState NewState, TSharedPtr<FAssetData> AssetData);
 	void OnGlobalCheckBoxStateChange(ECheckBoxState NewState);
