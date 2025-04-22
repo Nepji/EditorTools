@@ -30,7 +30,8 @@ public class EditorExtensions : ModuleRules
 				"Engine",
 				"UnrealEd",
 				"ContentBrowser",
-				"InputCore"
+				"InputCore",
+				"Projects"
 			}
 		);
 

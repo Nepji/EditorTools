@@ -6,6 +6,7 @@
 #include "EditorAssetLibrary.h"
 #include "ObjectTools.h"
 #include "AssetActions/AssetActionExtender.h"
+#include "CustomStyle/EditorExtensionStyle.h"
 #include "EditorExtensions/DebugUtils.h"
 #include "SlateWidgets/AdvancedDeletionWidget.h"
 
@@ -13,12 +14,14 @@
 
 void FEditorExtensionsModule::StartupModule()
 {
+	FEditorExtensionStyle::InitializeIcons();
 	InitCBMenuExtension();
 	RegisterAdvancedDeletionTab();
 }
 
 void FEditorExtensionsModule::ShutdownModule()
 {
+	FEditorExtensionStyle::ShutDown();
 }
 bool FEditorExtensionsModule::DeleteAsset(const FAssetData& AssetData)
 {
@@ -61,21 +64,21 @@ void FEditorExtensionsModule::AddCBMenuEntry(FMenuBuilder& MenuBuilder)
 	MenuBuilder.AddMenuEntry(
 		FText::FromString(TEXT("Delete Unused Assets")),
 		FText::FromString(TEXT("Safety delete all unused assets under folder")),
-		FSlateIcon(),
+		FSlateIcon(FEditorExtensionStyle::GetStyleSetName(), "ContentBrowser.DeleteUnusedAssets"),
 		FExecuteAction::CreateRaw(this, &FEditorExtensionsModule::OnDeleteUnusedAssets));
 
 	// Delete Unused Folders and Assets
 	MenuBuilder.AddMenuEntry(
 		FText::FromString(TEXT("Delete Unused Folders and Assets")),
 		FText::FromString(TEXT("Safety delete all unused folders and assets under selected folder")),
-		FSlateIcon(),
+		FSlateIcon(FEditorExtensionStyle::GetStyleSetName(), "ContentBrowser.DeleteEmptyFolders"),
 		FExecuteAction::CreateRaw(this, &FEditorExtensionsModule::OnEmptyFoldersAndAssetsDelete));
 
 	// Advance Deletion
 	MenuBuilder.AddMenuEntry(
 		FText::FromString(TEXT("Advance Deletion")),
 		FText::FromString(TEXT("Not implemented yet.")),
-		FSlateIcon(),
+		FSlateIcon(FEditorExtensionStyle::GetStyleSetName(), "ContentBrowser.AdvanceDeletion"),
 		FExecuteAction::CreateRaw(this, &FEditorExtensionsModule::OnAdvancedDeletion));
 }
 void FEditorExtensionsModule::OnDeleteUnusedAssets()
@@ -206,7 +209,8 @@ void FEditorExtensionsModule::RegisterAdvancedDeletionTab()
 	FGlobalTabmanager::Get()->RegisterNomadTabSpawner(
 								FName("AdvancedDeletion"),
 								FOnSpawnTab::CreateRaw(this, &FEditorExtensionsModule::OnSpawnAdvanceDeletion))
-		.SetDisplayName(FText::FromString(TEXT("Advanced Deletion")));
+		.SetDisplayName(FText::FromString(TEXT("Advanced Deletion")))
+		.SetIcon(FSlateIcon(FEditorExtensionStyle::GetStyleSetName(), "ContentBrowser.AdvanceDeletion"));
 }
 TSharedRef<SDockTab> FEditorExtensionsModule::OnSpawnAdvanceDeletion(const FSpawnTabArgs& SpawnTabArgs)
 {
@@ -294,7 +298,7 @@ void FEditorExtensionsModule::GetDuplicatedAssetData(const TArray<TSharedPtr<FAs
 }
 void FEditorExtensionsModule::SyncCBToClickedAsset(const FString& AssetPath)
 {
-	const TArray<FString> AssetPaths = {AssetPath};
+	const TArray<FString> AssetPaths = { AssetPath };
 	UEditorAssetLibrary::SyncBrowserToObjects(AssetPaths);
 }
 #undef LOCTEXT_NAMESPACE
