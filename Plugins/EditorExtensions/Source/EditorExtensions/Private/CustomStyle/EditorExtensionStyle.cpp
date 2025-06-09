@@ -36,9 +36,9 @@ TSharedRef<FSlateStyleSet> FEditorExtensionStyle::CreateSlateStyleSlate()
 	const FString IconDirectory = IPluginManager::Get().FindPlugin(TEXT("EditorExtensions"))->GetBaseDir() / "Resources";
 	CustomStyleSet->SetContentRoot(IconDirectory);
 
-	CustomStyleSet->Set("ContentBrowser.DeleteUnusedAssets", new FSlateImageBrush(IconDirectory / "DeleteUnusedAsset.png", Icon16x16));
-	CustomStyleSet->Set("ContentBrowser.DeleteEmptyFolders", new FSlateImageBrush(IconDirectory/"DeleteEmptyFolders.png",Icon16x16));
-	CustomStyleSet->Set("ContentBrowser.AdvanceDeletion", new FSlateImageBrush(IconDirectory/"AdvanceDeletion.png",Icon16x16));
+	CustomStyleSet->Set("ContentBrowser.DeleteUnusedAssets", new FSlateImageBrush(IconDirectory / "ToolIcon.png", Icon16x16));
+	CustomStyleSet->Set("ContentBrowser.DeleteEmptyFolders", new FSlateImageBrush(IconDirectory/"ToolIcon.png",Icon16x16));
+	CustomStyleSet->Set("ContentBrowser.AdvanceDeletion", new FSlateImageBrush(IconDirectory/"AdvancedDeletion.png",Icon16x16));
 
 	return CustomStyleSet;
 }
