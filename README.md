@@ -23,11 +23,9 @@
 
 - 🎨 **Custom Editor Icons**
   - Unique visual icons for tools and menus
-
-### 🔧 Currently in Development
-
+ 
 - 🧱 **Material Creation via Code**
-  - Generate simple material assets directly from C++ logic
+  - Generate simple material and MI assets directly from C++ logic
 
 ## 🗂️ Planned Features (TODO)
 
