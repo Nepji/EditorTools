@@ -89,18 +89,18 @@ void FEditorExtensionsModule::OnDeleteUnusedAssets()
 	}
 	if (FoldersPaths.Num() > 1)
 	{
-		DebugHepler::ShowMsgDialog(EAppMsgType::Ok, TEXT("For now you can only select one folder"));
+		DebugHelper::ShowMsgDialog(EAppMsgType::Ok, TEXT("For now you can only select one folder"));
 		return;
 	}
 
 	UAssetActionExtender::FixUpRedirectors();
 
-	DebugHepler::Print(TEXT("Currently running through folder: ") + FoldersPaths[ 0 ], FColor::Blue);
+	DebugHelper::Print(TEXT("Currently running through folder: ") + FoldersPaths[ 0 ], FColor::Blue);
 	TArray<FString> AssetList = UEditorAssetLibrary::ListAssets(FoldersPaths[ 0 ]);
 
 	if (AssetList.IsEmpty())
 	{
-		DebugHepler::ShowNotifyInfo(TEXT("No asset found under selected folder"));
+		DebugHelper::ShowNotifyInfo(TEXT("No asset found under selected folder"));
 		return;
 	}
 
@@ -112,7 +112,7 @@ void FEditorExtensionsModule::OnDeleteUnusedAssets()
 			|| AssetPathName.Contains(TEXT("__ExternalActors__"))
 			|| AssetPathName.Contains(TEXT("__ExternalObjects__")))
 		{
-			DebugHepler::ShowNotifyInfo(TEXT("Don`t touch root folders"));
+			DebugHelper::ShowNotifyInfo(TEXT("Don`t touch root folders"));
 			continue;
 		}
 
@@ -131,7 +131,7 @@ void FEditorExtensionsModule::OnDeleteUnusedAssets()
 
 	if (UnusedAssetsData.IsEmpty())
 	{
-		DebugHepler::ShowNotifyInfo(TEXT("No unused asset found under selected folder"));
+		DebugHelper::ShowNotifyInfo(TEXT("No unused asset found under selected folder"));
 		return;
 	}
 
@@ -139,7 +139,7 @@ void FEditorExtensionsModule::OnDeleteUnusedAssets()
 
 	if (NumOfDeletedAssets > 0)
 	{
-		DebugHepler::ShowNotifyInfo("Successfully deleted " + FString::FromInt(NumOfDeletedAssets) + " assets.");
+		DebugHelper::ShowNotifyInfo("Successfully deleted " + FString::FromInt(NumOfDeletedAssets) + " assets.");
 	}
 }
 void FEditorExtensionsModule::OnEmptyFoldersAndAssetsDelete()
@@ -161,7 +161,7 @@ void FEditorExtensionsModule::OnEmptyFoldersAndAssetsDelete()
 			|| FolderPath.Contains(TEXT("__ExternalActors__"))
 			|| FolderPath.Contains(TEXT("__ExternalObjects__")))
 		{
-			DebugHepler::ShowNotifyInfo(TEXT("Don`t touch root folders"));
+			DebugHelper::ShowNotifyInfo(TEXT("Don`t touch root folders"));
 			continue;
 		}
 
@@ -179,11 +179,11 @@ void FEditorExtensionsModule::OnEmptyFoldersAndAssetsDelete()
 
 	if (EmptyFolderPathsArray.IsEmpty())
 	{
-		DebugHepler::ShowNotifyInfo(TEXT("No unused folder found under selected folder"));
+		DebugHelper::ShowNotifyInfo(TEXT("No unused folder found under selected folder"));
 		return;
 	}
 
-	const EAppReturnType::Type ConfirmReturn = DebugHepler::ShowMsgDialog(EAppMsgType::OkCancel, TEXT("Found ") + FString::FromInt(EmptyFolderPathsArray.Num()) + "\nList: " + EmptyFolderPathsName + "\n\nConfirm to delete?");
+	const EAppReturnType::Type ConfirmReturn = DebugHelper::ShowMsgDialog(EAppMsgType::OkCancel, TEXT("Found ") + FString::FromInt(EmptyFolderPathsArray.Num()) + "\nList: " + EmptyFolderPathsName + "\n\nConfirm to delete?");
 
 	if (ConfirmReturn == EAppReturnType::Cancel)
 	{
@@ -196,7 +196,7 @@ void FEditorExtensionsModule::OnEmptyFoldersAndAssetsDelete()
 			++FolderCounter;
 		}
 	}
-	DebugHepler::ShowNotifyInfo("Successfully deleted " + FString::FromInt(FolderCounter) + " folders.");
+	DebugHelper::ShowNotifyInfo("Successfully deleted " + FString::FromInt(FolderCounter) + " folders.");
 }
 void FEditorExtensionsModule::OnAdvancedDeletion()
 {
@@ -236,7 +236,7 @@ TArray<TSharedPtr<FAssetData>> FEditorExtensionsModule::GetAllAssetDataUnderSele
 			|| AssetPath.Contains(TEXT("__ExternalActors__"))
 			|| AssetPath.Contains(TEXT("__ExternalObjects__")))
 		{
-			DebugHepler::ShowNotifyInfo(TEXT("Don`t touch root folders"));
+			DebugHelper::ShowNotifyInfo(TEXT("Don`t touch root folders"));
 			continue;
 		}
 

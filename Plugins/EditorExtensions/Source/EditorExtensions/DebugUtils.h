@@ -4,7 +4,7 @@
 #include "Widgets/Notifications/SNotificationList.h"
 #include "Framework/Notifications/NotificationManager.h"
 
-namespace DebugHepler
+namespace DebugHelper
 {
 	static void Print(const FString& Message, const FColor& Color = FColor::Red)
 	{

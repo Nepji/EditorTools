@@ -13,7 +13,7 @@ void UAssetActionExtender::SmartDuplicate(int32 NumOfDuplicates)
 {
 	if (NumOfDuplicates <= 0)
 	{
-		DebugHepler::ShowMsgDialog(EAppMsgType::Ok, "Number of wishing duplicates must be greater then 0.");
+		DebugHelper::ShowMsgDialog(EAppMsgType::Ok, "Number of wishing duplicates must be greater then 0.");
 		return;
 	}
 
@@ -36,15 +36,15 @@ void UAssetActionExtender::SmartDuplicate(int32 NumOfDuplicates)
 			}
 			else
 			{
-				DebugHepler::PrintLog("Error while duplicating Asset: " + CurrentAssetName);
+				DebugHelper::PrintLog("Error while duplicating Asset: " + CurrentAssetName);
 			}
 		}
 		if (ToDoCounter != NumOfDuplicates)
 		{
-			DebugHepler::ShowNotifyInfo("Duplication status: Error (Check Log for details)");
+			DebugHelper::ShowNotifyInfo("Duplication status: Error (Check Log for details)");
 		}
 	}
-	DebugHepler::ShowNotifyInfo("Duplication status: Finished");
+	DebugHelper::ShowNotifyInfo("Duplication status: Finished");
 }
 void UAssetActionExtender::AddOrChangePrefix()
 {
@@ -58,7 +58,7 @@ void UAssetActionExtender::AddOrChangePrefix()
 		IsPrefixExist(Asset->GetName(), UsedPrefix);
 		ChangeAssetPrefix(Asset, TargetPrefix, UsedPrefix);
 	}
-	DebugHepler::ShowNotifyInfo("Prefix Job status: Finished");
+	DebugHelper::ShowNotifyInfo("Prefix Job status: Finished");
 }
 void UAssetActionExtender::CleanupName(bool bReplaceBADPrefixes)
 {
@@ -81,7 +81,7 @@ void UAssetActionExtender::CleanupName(bool bReplaceBADPrefixes)
 			UEditorUtilityLibrary::RenameAsset(Asset, NewName);
 		}
 	}
-	DebugHepler::ShowNotifyInfo("Cleaning status: Finished");
+	DebugHelper::ShowNotifyInfo("Cleaning status: Finished");
 }
 void UAssetActionExtender::RemoveUnusedAssets()
 {
@@ -99,7 +99,7 @@ void UAssetActionExtender::RemoveUnusedAssets()
 	FixUpRedirectors();
 	if (UnusedAssetsData.IsEmpty())
 	{
-		DebugHepler::ShowNotifyInfo("Unused assets not found");
+		DebugHelper::ShowNotifyInfo("Unused assets not found");
 		return;
 	}
 
@@ -107,7 +107,7 @@ void UAssetActionExtender::RemoveUnusedAssets()
 
 	if (NumOfDeletedAssets != 0)
 	{
-	  DebugHepler::ShowNotifyInfo("Successfully deleted " + FString::FromInt(NumOfDeletedAssets) + " assets.");
+	  DebugHelper::ShowNotifyInfo("Successfully deleted " + FString::FromInt(NumOfDeletedAssets) + " assets.");
 	}
 }
 FString UAssetActionExtender::RequestPrefix(UObject* Obj) const
