@@ -39,6 +39,8 @@ TSharedRef<FSlateStyleSet> FEditorExtensionStyle::CreateSlateStyleSlate()
 	CustomStyleSet->Set("ContentBrowser.DeleteUnusedAssets", new FSlateImageBrush(IconDirectory / "ToolIcon.png", Icon16x16));
 	CustomStyleSet->Set("ContentBrowser.DeleteEmptyFolders", new FSlateImageBrush(IconDirectory/"ToolIcon.png",Icon16x16));
 	CustomStyleSet->Set("ContentBrowser.AdvanceDeletion", new FSlateImageBrush(IconDirectory/"AdvancedDeletion.png",Icon16x16));
-
+	CustomStyleSet->Set("ContentBrowser.Lock", new FSlateImageBrush(IconDirectory/"Lock.png",Icon16x16));
+	CustomStyleSet->Set("ContentBrowser.Unlock", new FSlateImageBrush(IconDirectory/"Unlock.png",Icon16x16));
+	
 	return CustomStyleSet;
 }

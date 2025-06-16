@@ -23,6 +23,9 @@ private:
 	TSharedRef<FExtender> CustomCBMenuExtender(const TArray<FString>& SelectedPaths);
 
 	TArray<FString> FoldersPaths;
+
+	FName LockedActorTagName = "Locked";
+	TWeakObjectPtr<class UEditorActorSubsystem> WeakEditorActorSubsystem;
 private:
 	void InitCBMenuExtension();
 	void AddCBMenuEntry(class FMenuBuilder& MenuBuilder);
@@ -35,6 +38,23 @@ private:
 	TSharedRef<SDockTab> OnSpawnAdvanceDeletion(const FSpawnTabArgs& SpawnTabArgs);
 
 	TArray<TSharedPtr<FAssetData>> GetAllAssetDataUnderSelectedFolder();
+
+	void InitLevelEditorExtension();
+
+	TSharedRef<FExtender> CustomLevelEditorMenuExtender(const TSharedRef<FUICommandList> UICommandList, const TArray<AActor*> SelectedActors);
+	void AddSVMenuEntry(FMenuBuilder& MenuBuilder);
+	
+	void OnLockActorSelectionButtonClicked();
+	void OnUnlockActorSelectionButtonClicked();
+
+	void InitCustomSelectionEvent();
+	void OnActorSelected(UObject* SelectedObject);
+
+	void LockActorSelection(AActor* ActorToProcess);
+	void UnlockActorSelection(AActor* ActorToProcess);
+	bool CheckIsActorSelectionLocked(AActor* ActorToProcess);
+
+	bool GetEditorActorSubSystem();
 	
 	
 };
