@@ -23,11 +23,9 @@
 
 - 🎨 **Custom Editor Icons**
   - Unique visual icons for tools and menus
-
-### 🔧 Currently in Development
-
+ 
 - 🧱 **Material Creation via Code**
-  - Generate simple material assets directly from C++ logic
+  - Generate simple material and MI assets directly from C++ logic
 
 ## 🗂️ Planned Features (TODO)
 
@@ -48,17 +46,23 @@
 The following section provides a quick visual walkthrough of the core features.
 
 
-![][_gif]
+![][AssetAcion_png]
+![][ContextAction_png]
+![][SlateWidget_png]
+![][MaterialCreation_png]
 
 
 <!-- Repository -->
 
 [repo_url]: https://github.com/Nepji/EditorTools
 [repo_logo_url]: https://github.com/Nepji/EditorTools
-[repo_logo_img]: 
 <!-- Project -->
 
-[Start-Climbing_gif]: https://github.com/Nepji/EditorTools/blob/main/.github/images/Start-Climbing.gif
+[AssetAcion_png]: https://github.com/Nepji/EditorTools/blob/main/.github/images/AssetAcion.png
+[ContextAction_png]: https://github.com/Nepji/EditorTools/blob/main/.github/images/ContextAction.png
+[MaterialCreation_png]: https://github.com/Nepji/EditorTools/blob/main/.github/images/MaterialCreation.png
+[SlateWidget_png]: https://github.com/Nepji/EditorTools/blob/main/.github/images/SlateWidget.png
+
 
 <!-- Author -->
 
