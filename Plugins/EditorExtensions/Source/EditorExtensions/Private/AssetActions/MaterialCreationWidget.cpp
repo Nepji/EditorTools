@@ -175,17 +175,19 @@ UMaterialInstance* UMaterialCreationWidget::CreateMaterialInstance(UMaterial* Cr
 																UMaterialInstanceConstant::StaticClass(),
 																MIFactoryNew);
 
-	if (UMaterialInstanceConstant* CreatedMI = Cast<UMaterialInstanceConstant>(CreatedObject))
+	UMaterialInstanceConstant* CreatedMI = Cast<UMaterialInstanceConstant>(CreatedObject);
+	if (!CreatedMI)
 	{
-		CreatedMI->SetParentEditorOnly(CreatedMaterial);
-
-		CreatedMI->PostEditChange();
-		CreatedMaterial->PostEditChange();
-
-		return CreatedMI;
+		return nullptr;
 	}
 
-	return nullptr;
+	
+	CreatedMI->SetParentEditorOnly(CreatedMaterial);
+
+	CreatedMI->PostEditChange();
+	CreatedMaterial->PostEditChange();
+
+	return CreatedMI;
 }
 
 void UMaterialCreationWidget::Default_CreateMaterialNodes(UMaterial* CreatedMaterial, UTexture2D* SelectedTexture, uint32& PinsConnCount)

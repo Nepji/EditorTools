@@ -42,7 +42,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Create Material", meta = (EditCondition = "bCreateMaterialInstanceOnFinish"))
 	bool bCustomMaterialInstanceName = true;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Create Material", meta = (EditCondition = "bCustomMaterialInstanceName"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Create Material", meta = (EditCondition = "bCustomMaterialInstanceName && bCreateMaterialInstanceOnFinish"))
 	FString MaterialInstanceName = TEXT("MI_NewMaterialInstance");
 	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "Supported Texture Names")
