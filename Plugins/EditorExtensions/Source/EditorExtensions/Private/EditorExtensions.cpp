@@ -11,6 +11,7 @@
 #include "SlateWidgets/AdvancedDeletionWidget.h"
 #include "LevelEditor.h"
 #include "Selection.h"
+#include "CustomUICommand/EditorExtensionsUICommands.h"
 #include "Subsystems/EditorActorSubsystem.h"
 
 #define LOCTEXT_NAMESPACE "FEditorExtensionsModule"
@@ -20,6 +21,10 @@ void FEditorExtensionsModule::StartupModule()
 	FEditorExtensionStyle::InitializeIcons();
 	InitCBMenuExtension();
 	RegisterAdvancedDeletionTab();
+
+	FEditorExtensionsUICommands::Register();
+	InitCustomUICommands();
+
 	InitLevelEditorExtension();
 	InitCustomSelectionEvent();
 }
@@ -259,6 +264,9 @@ void FEditorExtensionsModule::InitLevelEditorExtension()
 {
 	FLevelEditorModule& LevelEditorModule = FModuleManager::LoadModuleChecked<FLevelEditorModule>(TEXT("LEvelEditor"));
 
+	TSharedRef<FUICommandList> ExistingLevelCommands = LevelEditorModule.GetGlobalLevelEditorActions();
+	ExistingLevelCommands->Append(CustomUICommands.ToSharedRef());
+
 	TArray<FLevelEditorModule::FLevelViewportMenuExtender_SelectedActors>& LevelEditorMenuExtenders = LevelEditorModule.GetAllLevelViewportContextMenuExtenders();
 
 	LevelEditorMenuExtenders.Add(FLevelEditorModule::FLevelViewportMenuExtender_SelectedActors::CreateRaw(this, &FEditorExtensionsModule::CustomLevelEditorMenuExtender));
@@ -296,30 +304,30 @@ void FEditorExtensionsModule::AddSVMenuEntry(FMenuBuilder& MenuBuilder)
 }
 void FEditorExtensionsModule::OnLockActorSelectionButtonClicked()
 {
-	if(!GetEditorActorSubSystem())
+	if (!GetEditorActorSubSystem())
 	{
 		return;
 	}
 
-	TArray<AActor*> SelectedActors =  WeakEditorActorSubsystem->GetSelectedLevelActors();
+	TArray<AActor*> SelectedActors = WeakEditorActorSubsystem->GetSelectedLevelActors();
 
-	if(SelectedActors.IsEmpty())
+	if (SelectedActors.IsEmpty())
 	{
 		DebugHelper::ShowNotifyInfo(TEXT("No Actor selected."));
 		return;
 	}
 
 	FString CurrentLockedActorNames = TEXT("Locked selection for:");
-	for(AActor* SelectedActor : SelectedActors)
+	for (AActor* SelectedActor : SelectedActors)
 	{
-		if(!SelectedActor)
+		if (!SelectedActor)
 		{
 			continue;
 		}
 
 		LockActorSelection(SelectedActor);
 
-		WeakEditorActorSubsystem->SetActorSelectionState(SelectedActor,false);
+		WeakEditorActorSubsystem->SetActorSelectionState(SelectedActor, false);
 		CurrentLockedActorNames.Append(TEXT("\n") + SelectedActor->GetActorLabel());
 	}
 
@@ -327,21 +335,21 @@ void FEditorExtensionsModule::OnLockActorSelectionButtonClicked()
 }
 void FEditorExtensionsModule::OnUnlockActorSelectionButtonClicked()
 {
-	if(!GetEditorActorSubSystem())
+	if (!GetEditorActorSubSystem())
 	{
 		return;
 	}
 	TArray<AActor*> AllActorsInLevel = WeakEditorActorSubsystem->GetAllLevelActors();
 
 	FString CurrentLockedActorNames = TEXT("Unkocked selection for:");
-	for(AActor* SelectedActor : AllActorsInLevel)
+	for (AActor* SelectedActor : AllActorsInLevel)
 	{
-		if(!SelectedActor)
+		if (!SelectedActor)
 		{
 			continue;
 		}
 
-		if(!CheckIsActorSelectionLocked(SelectedActor))
+		if (!CheckIsActorSelectionLocked(SelectedActor))
 		{
 			continue;
 		}
@@ -359,42 +367,42 @@ void FEditorExtensionsModule::InitCustomSelectionEvent()
 }
 void FEditorExtensionsModule::OnActorSelected(UObject* SelectedObject)
 {
-	if(!WeakEditorActorSubsystem.IsValid())
-	{
-		return;
-	}
-	
-	AActor* SelectedActor = Cast<AActor>(SelectedObject);
-	if(!SelectedActor)
+	if (!WeakEditorActorSubsystem.IsValid())
 	{
 		return;
 	}
 
-	if(CheckIsActorSelectionLocked(SelectedActor))
+	AActor* SelectedActor = Cast<AActor>(SelectedObject);
+	if (!SelectedActor)
+	{
+		return;
+	}
+
+	if (CheckIsActorSelectionLocked(SelectedActor))
 	{
 		WeakEditorActorSubsystem->SetActorSelectionState(SelectedActor, false);
 	}
 }
 void FEditorExtensionsModule::LockActorSelection(AActor* ActorToProcess)
 {
-	if(!ActorToProcess)
+	if (!ActorToProcess)
 	{
 		return;
 	}
-	
-	if(!ActorToProcess->ActorHasTag(LockedActorTagName))
+
+	if (!ActorToProcess->ActorHasTag(LockedActorTagName))
 	{
 		ActorToProcess->Tags.Add(FName(LockedActorTagName));
 	}
 }
 void FEditorExtensionsModule::UnlockActorSelection(AActor* ActorToProcess)
 {
-	if(!ActorToProcess)
+	if (!ActorToProcess)
 	{
 		return;
 	}
-	
-	if(ActorToProcess->ActorHasTag(LockedActorTagName))
+
+	if (ActorToProcess->ActorHasTag(LockedActorTagName))
 	{
 		ActorToProcess->Tags.Remove(LockedActorTagName);
 	}
@@ -409,11 +417,23 @@ bool FEditorExtensionsModule::CheckIsActorSelectionLocked(AActor* ActorToProcess
 }
 bool FEditorExtensionsModule::GetEditorActorSubSystem()
 {
-	if(!WeakEditorActorSubsystem.IsValid())
+	if (!WeakEditorActorSubsystem.IsValid())
 	{
 		WeakEditorActorSubsystem = GEditor->GetEditorSubsystem<UEditorActorSubsystem>();
 	}
 	return WeakEditorActorSubsystem.IsValid();
+}
+void FEditorExtensionsModule::InitCustomUICommands()
+{
+	CustomUICommands = MakeShareable(new FUICommandList());
+
+	CustomUICommands->MapAction(
+		FEditorExtensionsUICommands::Get().LockActorSelection,
+		FExecuteAction::CreateRaw(this, &FEditorExtensionsModule::OnLockActorSelectionButtonClicked));
+
+	CustomUICommands->MapAction(
+		FEditorExtensionsUICommands::Get().UnlockActorSelection,
+		FExecuteAction::CreateRaw(this, &FEditorExtensionsModule::OnUnlockActorSelectionButtonClicked));
 }
 void FEditorExtensionsModule::GetUnusedAssetData(const TArray<TSharedPtr<FAssetData>>& AssetDataToFilter, TArray<TSharedPtr<FAssetData>>& FilteredAssetData)
 {

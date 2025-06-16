@@ -26,6 +26,8 @@ private:
 
 	FName LockedActorTagName = "Locked";
 	TWeakObjectPtr<class UEditorActorSubsystem> WeakEditorActorSubsystem;
+
+	TSharedPtr<class FUICommandList> CustomUICommands;
 private:
 	void InitCBMenuExtension();
 	void AddCBMenuEntry(class FMenuBuilder& MenuBuilder);
@@ -55,6 +57,8 @@ private:
 	bool CheckIsActorSelectionLocked(AActor* ActorToProcess);
 
 	bool GetEditorActorSubSystem();
+
+	void InitCustomUICommands();
 	
 	
 };
