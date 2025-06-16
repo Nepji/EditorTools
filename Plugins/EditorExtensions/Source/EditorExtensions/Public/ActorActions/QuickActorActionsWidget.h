@@ -20,13 +20,13 @@ struct FRandomActorRotation
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RandomActorRotation")
 	E_QuickActionAxis AxisForRotation = E_QuickActionAxis::EDA_X;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RandomActorRotation")
 	bool NegativeMirroredRotationDegree = true;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMax = 360, ClampMin = -360))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMax = 360, ClampMin = -360), Category = "RandomActorRotation")
 	int32 MaxRotationDegree = 180;
 };
 
@@ -35,10 +35,10 @@ struct FRandomActorScale
 {
 	GENERATED_BODY()
 	
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "RandomActorScale")
 	float ScaleMin = .8f;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "RandomActorScale")
 	float ScaleMax = 1.2f;
 };
 
@@ -47,10 +47,10 @@ struct FRandomActorOffset
 {
 	GENERATED_BODY()
 	
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "RandomActorOffset")
 	float OffsetMin  = -50.f;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "RandomActorOffset")
 	float OffsetMax  = 50.f;
 };
 
@@ -60,7 +60,7 @@ class EDITOREXTENSIONS_API UQuickActorActionsWidget : public UEditorUtilityWidge
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "ActorBatchSelection")
 	void SelectAllActorWithSimilarName();
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ActorBatchSelection")
@@ -72,7 +72,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ActorBatchSelection", meta = (EditCondition = "FindSpecificActorName"))
 	FString ActorNameToFind = FString();
 	
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "ActorBatchDuplication")
 	void DuplicateActors();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ActorBatchDuplication")
@@ -85,7 +85,7 @@ public:
 	float OffsetDistance = 300.f;
 
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "ActorBatchRandomTransform")
 	void RandomTransformActors();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ActorBatchRandomTransform")

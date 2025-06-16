@@ -32,7 +32,8 @@ public class EditorExtensions : ModuleRules
 				"ContentBrowser",
 				"InputCore",
 				"Projects",
-				"UMG"
+				"UMG",
+				"SceneOutliner"
 			}
 		);
 

@@ -10,7 +10,9 @@
 #include "EditorExtensions/DebugUtils.h"
 #include "SlateWidgets/AdvancedDeletionWidget.h"
 #include "LevelEditor.h"
+#include "SceneOutlinerModule.h"
 #include "Selection.h"
+#include "CustomOutlinerColumn/OutlinerSelectionColumn.h"
 #include "CustomUICommand/EditorExtensionsUICommands.h"
 #include "Subsystems/EditorActorSubsystem.h"
 
@@ -27,11 +29,17 @@ void FEditorExtensionsModule::StartupModule()
 
 	InitLevelEditorExtension();
 	InitCustomSelectionEvent();
+
+	InitSceneOutlinerExtension();
 }
 
 void FEditorExtensionsModule::ShutdownModule()
 {
+	FGlobalTabmanager::Get()->UnregisterNomadTabSpawner(FName("AdvanceDeletion"));
+	
 	FEditorExtensionStyle::ShutDown();
+
+	UnRegisterSceneOutlinerColumn();
 }
 bool FEditorExtensionsModule::DeleteAsset(const FAssetData& AssetData)
 {
@@ -224,6 +232,11 @@ void FEditorExtensionsModule::RegisterAdvancedDeletionTab()
 }
 TSharedRef<SDockTab> FEditorExtensionsModule::OnSpawnAdvanceDeletion(const FSpawnTabArgs& SpawnTabArgs)
 {
+	if(FoldersPaths.IsEmpty())
+	{
+		return SNew(SDockTab).TabRole(NomadTab);
+	}
+	
 	return SNew(SDockTab).TabRole(ETabRole::NomadTab)
 		[ SNew(SAdvanceDeletionsTab)
 			  .AssetsDataToStore(GetAllAssetDataUnderSelectedFolder()) ];
@@ -331,6 +344,8 @@ void FEditorExtensionsModule::OnLockActorSelectionButtonClicked()
 		CurrentLockedActorNames.Append(TEXT("\n") + SelectedActor->GetActorLabel());
 	}
 
+	RefreshSceneOutliner();
+
 	DebugHelper::ShowNotifyInfo(CurrentLockedActorNames);
 }
 void FEditorExtensionsModule::OnUnlockActorSelectionButtonClicked()
@@ -358,6 +373,9 @@ void FEditorExtensionsModule::OnUnlockActorSelectionButtonClicked()
 		WeakEditorActorSubsystem->SetActorSelectionState(SelectedActor, true);
 		CurrentLockedActorNames.Append(TEXT("\n") + SelectedActor->GetActorLabel());
 	}
+
+	RefreshSceneOutliner();
+	
 	DebugHelper::ShowNotifyInfo(CurrentLockedActorNames);
 }
 void FEditorExtensionsModule::InitCustomSelectionEvent()
@@ -407,6 +425,17 @@ void FEditorExtensionsModule::UnlockActorSelection(AActor* ActorToProcess)
 		ActorToProcess->Tags.Remove(LockedActorTagName);
 	}
 }
+void FEditorExtensionsModule::RefreshSceneOutliner()
+{
+	FLevelEditorModule& LevelEditorModule = FModuleManager::LoadModuleChecked<FLevelEditorModule>(TEXT("LevelEditor"));
+
+	TSharedPtr<ISceneOutliner>SceneOutliner =  LevelEditorModule.GetFirstLevelEditor()->GetSceneOutliner();
+
+	if(SceneOutliner.IsValid())
+	{
+		SceneOutliner->FullRefresh();
+	}
+}
 bool FEditorExtensionsModule::CheckIsActorSelectionLocked(AActor* ActorToProcess)
 {
 	if (!ActorToProcess)
@@ -414,6 +443,23 @@ bool FEditorExtensionsModule::CheckIsActorSelectionLocked(AActor* ActorToProcess
 		return false;
 	}
 	return ActorToProcess->ActorHasTag(LockedActorTagName);
+}
+void FEditorExtensionsModule::ProcessLockingForOutliner(AActor* ActorToProcess, bool bShouldLock)
+{
+	if(!GetEditorActorSubSystem())
+	{
+		return;
+	}
+	if(bShouldLock)
+	{
+		LockActorSelection(ActorToProcess);
+		WeakEditorActorSubsystem->SetActorSelectionState(ActorToProcess,false);
+	}
+	else
+	{
+		UnlockActorSelection(ActorToProcess);
+		WeakEditorActorSubsystem->SetActorSelectionState(ActorToProcess,true);
+	}
 }
 bool FEditorExtensionsModule::GetEditorActorSubSystem()
 {
@@ -434,6 +480,26 @@ void FEditorExtensionsModule::InitCustomUICommands()
 	CustomUICommands->MapAction(
 		FEditorExtensionsUICommands::Get().UnlockActorSelection,
 		FExecuteAction::CreateRaw(this, &FEditorExtensionsModule::OnUnlockActorSelectionButtonClicked));
+}
+void FEditorExtensionsModule::InitSceneOutlinerExtension()
+{
+	FSceneOutlinerModule& SceneOutlinerModule = FModuleManager::LoadModuleChecked<FSceneOutlinerModule>(TEXT("SceneOutliner"));
+
+	const FSceneOutlinerColumnInfo SelectionLockColumnInfo(ESceneOutlinerColumnVisibility::Visible,
+													 1,
+													 FCreateSceneOutlinerColumn::CreateRaw(this, & FEditorExtensionsModule::OnCreateSelectionLockColumn));
+	
+	SceneOutlinerModule.RegisterDefaultColumnType<FOutlinerSelectionColumn>(SelectionLockColumnInfo);
+}
+TSharedRef<ISceneOutlinerColumn> FEditorExtensionsModule::OnCreateSelectionLockColumn(ISceneOutliner& SceneOutliner)
+{
+	return MakeShareable(new FOutlinerSelectionColumn(SceneOutliner));
+}
+void FEditorExtensionsModule::UnRegisterSceneOutlinerColumn()
+{
+	FSceneOutlinerModule& SceneOutlinerModule = FModuleManager::LoadModuleChecked<FSceneOutlinerModule>(TEXT("SceneOutliner"));
+
+	SceneOutlinerModule.UnRegisterColumnType<FOutlinerSelectionColumn>();
 }
 void FEditorExtensionsModule::GetUnusedAssetData(const TArray<TSharedPtr<FAssetData>>& AssetDataToFilter, TArray<TSharedPtr<FAssetData>>& FilteredAssetData)
 {

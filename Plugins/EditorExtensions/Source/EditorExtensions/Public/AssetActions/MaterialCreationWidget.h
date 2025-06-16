@@ -24,7 +24,7 @@ class EDITOREXTENSIONS_API UMaterialCreationWidget : public UEditorUtilityWidget
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Create Material")
 	void CreateMaterialFromSelectedTexture();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Create Material")

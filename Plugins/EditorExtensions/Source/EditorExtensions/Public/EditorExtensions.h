@@ -19,6 +19,9 @@ public:
 	void GetDuplicatedAssetData(const TArray<TSharedPtr<FAssetData>>& AssetDataToFilter, TArray<TSharedPtr<FAssetData>>& FilteredAssetData);
 
 	void SyncCBToClickedAsset(const FString& AssetPath);
+
+	bool CheckIsActorSelectionLocked(AActor* ActorToProcess);
+	void ProcessLockingForOutliner(AActor* ActorToProcess, bool bShouldLock);
 private:
 	TSharedRef<FExtender> CustomCBMenuExtender(const TArray<FString>& SelectedPaths);
 
@@ -54,11 +57,16 @@ private:
 
 	void LockActorSelection(AActor* ActorToProcess);
 	void UnlockActorSelection(AActor* ActorToProcess);
-	bool CheckIsActorSelectionLocked(AActor* ActorToProcess);
+
+	void RefreshSceneOutliner();
 
 	bool GetEditorActorSubSystem();
 
 	void InitCustomUICommands();
+
+	void InitSceneOutlinerExtension();
+	TSharedRef<class ISceneOutlinerColumn> OnCreateSelectionLockColumn(class ISceneOutliner&  SceneOutliner);
+	void UnRegisterSceneOutlinerColumn();
 	
 	
 };
