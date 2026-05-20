@@ -27,6 +27,7 @@ public class EditorExtensions : ModuleRules
 			{
 				"Core",
 				"Blutility",
+				"DeveloperSettings",
 				"Engine",
 				"UnrealEd",
 				"ContentBrowser",
