@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #include "AssetActions/MaterialCreationWidget.h"
 
 #include "AssetToolsModule.h"
@@ -7,7 +5,6 @@
 #include "EditorUtilityLibrary.h"
 #include "EditorExtensions/DebugUtils.h"
 #include "Factories/MaterialFactoryNew.h"
-#include "Factories/MaterialFunctionInstanceFactory.h"
 #include "Factories/MaterialInstanceConstantFactoryNew.h"
 #include "Materials/MaterialExpressionTextureSample.h"
 #include "Materials/MaterialInstanceConstant.h"
@@ -89,7 +86,7 @@ bool UMaterialCreationWidget::ProcessSelectedData(const TArray<FAssetData>& Sele
 	}
 
 	bool bMaterialNameSet = false;
-	for (const FAssetData Data : SelectedDataToProcess)
+	for (const FAssetData& Data : SelectedDataToProcess)
 	{
 		UObject* SelectedAsset = Data.GetAsset();
 		if (!SelectedAsset)

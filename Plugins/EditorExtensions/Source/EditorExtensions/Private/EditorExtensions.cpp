@@ -17,9 +17,12 @@
 #include "Subsystems/EditorActorSubsystem.h"
 
 #define LOCTEXT_NAMESPACE "FEditorExtensionsModule"
+#include "EditorAction/EditorUIScaleCustomizationSettings.h"
 
 void FEditorExtensionsModule::StartupModule()
 {
+	UEditorUIScaleCustomizationSettings::InitUIScaleCustomizationSettings();
+
 	FEditorExtensionStyle::InitializeIcons();
 	InitCBMenuExtension();
 	RegisterAdvancedDeletionTab();
