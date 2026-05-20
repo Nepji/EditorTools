@@ -1,73 +1,65 @@
-# EditorTools – Unreal Engine 5 (C++ Utility Plugin)
+# EditorTools for Unreal Engine 5
 
-**EditorTools** is a powerful set of custom tools and utilities for Unreal Engine 5, developed entirely in **C++**, aimed at enhancing the workflow and productivity of developers and technical artists. This plugin provides quick actions, custom editor menus, asset utilities, and more — all deeply integrated into the UE5 editor environment.
+EditorTools is an utility plugin for Unreal Engine 5, developed entirely in C++. This toolset is designed to significantly enhance the workflow and boost the productivity of developers and technical artists by providing a comprehensive suite of quick actions, custom editor menus, asset management utilities, and flexible interface customization options that integrate seamlessly into the Unreal Engine 5 editor environment.
 
-## ⚙️ Features
+## Implemented Features
 
-### ✅ Implemented Tools
 - 🛠️ **Quick Asset Actions**
-  - Apply asset name prefixes
-  - Remove or duplicate assets
-  - Delete unused assets under a selected folder
-  - Fix up redirectors
-
-- 📁 **Content Browser Extensions**
-  - Custom context menu entries
-  - Delegates & function binding for custom actions
-  - Search and remove unused assets
-
-- 🧩 **Slate Widget Tool**
-  - Private sorting and filtering functions
-  - Sync Content Browser to selected assets
-  - Standalone window UI for faster navigation
-
-- 🎨 **Custom Editor Icons**
-  - Unique visual icons for tools and menus
- 
-- 🧱 **Material Creation via Code**
-  - Generate simple material and MI assets directly from C++ logic
-
-## 🗂️ Planned Features (TODO)
+  - **Smart Duplicate**: Duplicate assets multiple times with auto-incrementing numeric suffixes.
+  - **Prefix Management**: Automatically assign or fix asset prefixes based on their specific class.
+  - **Cleanup Name**: Strip unwanted substrings or pre-defined "mess" from selected asset names.
+  - **Remove Unused Assets**: Identify and safely batch-delete assets that have no references in the project.
+  - **Fix Up Redirectors**: Automatically find and fix up object redirectors across the game directory.
 
 - 🎭 **Quick Actor Actions**
-  - Perform batch operations on selected actors in the level
+  - **Select Similar**: Automatically select all level actors sharing a similar name substring.
+  - **Linear Duplication**: Duplicate selected actors multiple times with a customizable offset distance along specific axes (X, Y, or Z).
+  - **Random Transform**: Apply random rotation, scaling, and location offsets to selected actors within defined minimum and maximum ranges.
 
-- 🧩 **Extended Level Editor Menu**
-  - Add custom entries to the actor context menu
-
-- ⌨️ **Custom Editor Key Bindings**
-  - Bind hotkeys to trigger EditorTools actions
+- 🧩 **Advanced Deletion Widget (Slate)**
+  - **Standalone UI**: Dedicated window for managing and deleting assets.
+  - **Smart Filtering**: Filter displayed assets by categories such as All Assets, Unused Assets, and Duplicated Assets.
+  - **Batch Deletion**: Select multiple assets using checkboxes for rapid bulk deletion.
+  - **Browser Sync**: Synchronize the Content Browser seamlessly to clicked assets in the list.
 
 - 🌍 **World Outliner Extensions**
-  - Custom context options and filters in the World Outliner
+  - **Actor Selection Column**: Adds a custom column with a lock/unlock toggle directly in the Scene Outliner to prevent accidental selection of specific actors.
 
-### 🕹️ Overview
+- 🖥️ **UI Scale Customization**
+  - **Interface Scaling**: Dedicated settings to dynamically adjust and scale the Unreal Engine editor interface controls for better visibility and comfort.
 
-The following section provides a quick visual walkthrough of the core features.
+- 🧱 **Material Creation via Code**
+  - **Asset Generation**: Generate simple materials and Material Instance (MI) assets directly from C++ logic, automating graphical resource setup.
 
+- 🎨 **Custom Editor Icons**
+  - **Visual Polish**: Display unique, custom visual icons for all custom tools, actions, and menu items to improve UX.
 
-![][AssetAcion_png]
-![][ContextAction_png]
-![][SlateWidget_png]
-![][MaterialCreation_png]
+## Features in development
 
+- 🧩 **Extended Level Editor Menu**
+  - Add custom context entries and specialized commands directly to the actor viewport context menu.
 
-<!-- Repository -->
+- ⌨️ **Custom Editor Key Bindings**
+  - Bind custom hotkeys and shortcuts to rapidly trigger specific EditorTools actions.
+  
+  
+## Planned Features (TODO)
 
-[repo_url]: https://github.com/Nepji/EditorTools
-[repo_logo_url]: https://github.com/Nepji/EditorTools
-<!-- Project -->
+- 📈 **Outliner and Context Sorting**
+  - Sort World Outliner and context menu items based on specified input parameters.
 
-[AssetAcion_png]: https://github.com/Nepji/EditorTools/blob/main/.github/images/AssetAcion.png
-[ContextAction_png]: https://github.com/Nepji/EditorTools/blob/main/.github/images/ContextAction.png
-[MaterialCreation_png]: https://github.com/Nepji/EditorTools/blob/main/.github/images/MaterialCreation.png
-[SlateWidget_png]: https://github.com/Nepji/EditorTools/blob/main/.github/images/SlateWidget.png
+## Visual Overview
 
+The following demonstration materials illustrate the operation of the key system components within the development environment.
 
-<!-- Author -->
+![Asset Actions](https://github.com/Nepji/EditorTools/blob/main/.github/images/AssetAcion.png)
 
-[author]: https://github.com/Nepji
+![Context Actions](https://github.com/Nepji/EditorTools/blob/main/.github/images/ContextAction.png)
 
-<!-- Readme links -->
+![Slate Widget UI](https://github.com/Nepji/EditorTools/blob/main/.github/images/SlateWidget.png)
 
+![Material Generation](https://github.com/Nepji/EditorTools/blob/main/.github/images/MaterialCreation.png)
 
+![Quick Actor Actions](https://github.com/Nepji/EditorTools/blob/main/.github/images/QuickActorActions.png)
+
+All necessary repository links and detailed author information can be found on the main project repository page.
