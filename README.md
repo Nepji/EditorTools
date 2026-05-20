@@ -27,8 +27,6 @@
 - 🧱 **Material Creation via Code**
   - Generate simple material and MI assets directly from C++ logic
 
-## 🗂️ Planned Features (TODO)
-
 - 🎭 **Quick Actor Actions**
   - Perform batch operations on selected actors in the level
 

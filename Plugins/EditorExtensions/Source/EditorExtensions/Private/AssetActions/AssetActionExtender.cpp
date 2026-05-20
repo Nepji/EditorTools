@@ -118,8 +118,11 @@ FString UAssetActionExtender::RequestPrefix(UObject* Obj) const
 		return BadResult;
 	}
 
-	const FString* Prefix = AssetPrefixMap.Find(Obj->GetClass()->GetName());
-	return Prefix ? *Prefix : *BadResult;
+	if (const FAdditionalAssetClassesDetails* Found = FAdditionalAssetClassesDetails::Find(AssetClassPrefixes, Obj->GetClass()->GetName()))
+	{
+		return Found->ClassPrefix;
+	}
+	return BadResult;
 }
 void UAssetActionExtender::ChangeAssetPrefix(UObject* Obj, const FString& TargetPrefix, const FString& UsedPrefix) const
 {
@@ -139,11 +142,11 @@ void UAssetActionExtender::ChangeAssetPrefix(UObject* Obj, const FString& Target
 }
 bool UAssetActionExtender::IsPrefixExist(const FString& ObjName, FString& Prefix)
 {
-	for (auto AssetPrefix : AssetPrefixMap)
+	for (auto AssetPrefix : AssetClassPrefixes )
 	{
-		if (ObjName.StartsWith(AssetPrefix.Value))
+		if (ObjName.StartsWith(AssetPrefix.ClassPrefix))
 		{
-			Prefix = AssetPrefix.Value;
+			Prefix = AssetPrefix.ClassPrefix;
 			return true;
 		}
 	}

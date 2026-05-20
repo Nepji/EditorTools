@@ -6,9 +6,34 @@
 #include "AssetActionUtility.h"
 #include "AssetActionExtender.generated.h"
 
-/**
- *
- */
+USTRUCT(Blueprintable)
+struct FAdditionalAssetClassesDetails
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Default")
+	FString ClassName = FString();
+	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Default")
+	FString ClassPrefix = FString();
+
+	static const FAdditionalAssetClassesDetails* Find(const TArray<FAdditionalAssetClassesDetails>& From, const FString& Find)
+	{
+		if (Find.IsEmpty())
+		{ 
+			return nullptr;
+		}
+		for (const FAdditionalAssetClassesDetails& StructInstance : From)
+		{
+			if (StructInstance.ClassName == Find || StructInstance.ClassPrefix == Find)
+			{
+				return &StructInstance;
+			}
+		}
+		return nullptr;
+	}
+};
+
 UCLASS()
 class EDITOREXTENSIONS_API UAssetActionExtender : public UAssetActionUtility
 {
@@ -36,8 +61,9 @@ private:
 
 
 
-private:
-	TMap<FString, FString> AssetPrefixMap = {
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (TitleProperty = "ClassName"), Category="Default")
+	TArray<FAdditionalAssetClassesDetails> AssetClassPrefixes = {
 		{ "Material", "M_" },
 		{ "MaterialInstance", "MI_" },
 		{ "MaterialInstanceConstant", "MI_" },
@@ -48,11 +74,16 @@ private:
 		{ "StaticMesh", "SM_" },
 		{ "SkeletalMesh", "SK_" },
 		{ "AnimSequence", "AS_" },
+		{ "Montages", "AM_" },
+		{ "AnimationBlueprint", "ABP_" },
 		{ "Blueprint", "BP_" },
-		{ "SoundWave", "SW_" },
-		{ "SoundCue", "SCue_" },
+		{ "BlueprintInterface", "BI_" },
+		{ "WidgetBlueprint", "WBP_" },
+		{ "ActorComponent", "AC_" },
 		{ "Level", "LVL_" },
 		{ "World", "WRLD_" },
+		{ "SoundWave", "SW_" },
+		{ "SoundCue", "SCue_" },
 		{ "ParticleSystem", "PS_" },
 		{ "NiagaraSystem", "FXS_" },
 		{ "NiagaraEmitter", "FXE_" },
@@ -61,17 +92,12 @@ private:
 		{ "PhysicsMaterial", "PM_" },
 		{ "PostProcessMaterial", "PPM_" },
 		{ "Skeleton", "SKEL_" },
-		{ "Montages", "AM_" },
 		{ "BlendSpace", "BS_" },
-		{ "AnimationBlueprint", "ABP_" },
-		{ "WidgetBlueprint", "WBP_" },
 		{ "DataTable", "DT_" },
 		{ "CurveTable", "CT_" },
 		{ "Enum", "E_" },
 		{ "Structure", "F_" },
 		{ "Rig", "Rig_" },
-		{ "ActorComponent", "AC_" },
-		{ "BlueprintInterface", "BI_" },
 		{ "LevelSequence", "LS_" },
 		{ "SequencerEdits", "EDIT_" },
 		{ "MediaSource", "MS_" },
@@ -82,7 +108,18 @@ private:
 		{ "RemoteControlPreset", "RCP_" },
 		{ "NDisplayConfiguration", "NDC_" },
 		{ "OCIOProfile", "OCIO_" },
-		{ "HDRI", "HDR_" }
+		{ "HDRI", "HDR_" },
+		{ "Blueprint", "GE_" },
+		{ "GameplayAbility", "GA_" },
+		{ "GameplayCue", "GC_" },
+		{ "GameplayCueNotify", "GCN_" },
+		{ "GameplayCueNotify_Static", "GCNS_" },
+		{ "GameplayCueNotify_Looping", "GCNL_" },
+		{ "AttributeSet", "AS_" },
+		{ "AbilityTask", "AT_" },
+		{ "AbilitySystemComponent", "ASC_" },
+		{ "GameplayTag", "Tag_" },
+		{ "GameplayTagContainer", "Tags_" }
 	};
 
 	TArray<FString> AssetMess = {
